@@ -1,20 +1,64 @@
-import { useAuth } from "@/contexts/AuthContext";
-import { Button } from "@/components/ui/button";
+import { Layout } from "@/components/layout/Layout";
+import { StatsCard } from "@/components/dashboard/StatsCard";
+import { RecentActivity } from "@/components/dashboard/RecentActivity";
+import { QuickActions } from "@/components/dashboard/QuickActions";
+import { FileText, BookOpen, Brain, Folder } from "lucide-react";
 
 export default function DashboardPage() {
-  const { user, logout } = useAuth();
+  // Mock data - will be replaced with real API data later
+  const stats = [
+    {
+      title: "Total Content",
+      value: 45,
+      description: "Uploaded documents",
+      icon: FileText,
+      trend: { value: 12, isPositive: true },
+    },
+    {
+      title: "Flashcards",
+      value: 123,
+      description: "Study cards created",
+      icon: BookOpen,
+      trend: { value: 8, isPositive: true },
+    },
+    {
+      title: "Quizzes",
+      value: 67,
+      description: "Quizzes generated",
+      icon: Brain,
+      trend: { value: 5, isPositive: true },
+    },
+    {
+      title: "Folders",
+      value: 8,
+      description: "Organized collections",
+      icon: Folder,
+    },
+  ];
 
   return (
-    <div className="min-h-screen p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <Button onClick={logout} variant="outline">
-            Logout
-          </Button>
+    <Layout>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+          <p className="text-muted-foreground">
+            Welcome back! Here's your learning overview.
+          </p>
         </div>
-        <p>Welcome, {user?.name}!</p>
+
+        {/* Stats Grid */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {stats.map((stat) => (
+            <StatsCard key={stat.title} {...stat} />
+          ))}
+        </div>
+
+        {/* Quick Actions & Recent Activity */}
+        <div className="grid gap-6 md:grid-cols-2">
+          <QuickActions />
+          <RecentActivity />
+        </div>
       </div>
-    </div>
+    </Layout>
   );
 }

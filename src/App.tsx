@@ -7,6 +7,13 @@ import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import DashboardPage from "@/pages/DashboardPage";
 
+// Placeholder pages
+const UploadPage = () => <div>Upload Page (Coming Soon)</div>;
+const ContentPage = () => <div>Content Page (Coming Soon)</div>;
+const MaterialsPage = () => <div>Materials Page (Coming Soon)</div>;
+const AnalyticsPage = () => <div>Analytics Page (Coming Soon)</div>;
+const SettingsPage = () => <div>Settings Page (Coming Soon)</div>;
+
 function App() {
   return (
     <ThemeProvider>
@@ -20,6 +27,46 @@ function App() {
               element={
                 <ProtectedRoute>
                   <DashboardPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/upload"
+              element={
+                <ProtectedRoute>
+                  <UploadPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/content"
+              element={
+                <ProtectedRoute>
+                  <ContentPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/materials"
+              element={
+                <ProtectedRoute>
+                  <MaterialsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/analytics"
+              element={
+                <ProtectedRoute>
+                  <AnalyticsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoute>
+                  <SettingsPage />
                 </ProtectedRoute>
               }
             />
