@@ -23,3 +23,35 @@ export interface RegisterCredentials {
   password: string;
   name: string;
 }
+
+export interface UploadResponse {
+  success: boolean;
+  data: {
+    content: Content;
+    jobId?: string;
+  };
+}
+
+export interface Content {
+  _id: string;
+  userId: string;
+  type: "pdf" | "url" | "youtube";
+  title: string;
+  sourceUrl?: string;
+  filePath?: string;
+  metadata: {
+    fileSize?: number;
+    mimeType?: string;
+    duration?: number;
+  };
+  status: "pending" | "processing" | "completed" | "failed";
+  createdAt: string;
+}
+
+export interface JobStatus {
+  _id: string;
+  status: "waiting" | "active" | "completed" | "failed";
+  progress?: number;
+  result?: any;
+  error?: string;
+}
