@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Loader2 } from "lucide-react";
@@ -11,7 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { GenerateDialog } from "@/components/materials/GenerateDialog";
+import { GeneratePreviewDialog } from "@/components/materials/GeneratePreviewDialog";
 import { MaterialCard } from "@/components/materials/MaterialCard";
 import { useMaterials } from "@/hooks/useMaterials";
 import { api } from "@/lib/api";
@@ -20,6 +21,11 @@ import type { Content } from "@/types";
 export default function ContentDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+
+  // Track generated data for preview
+  const [flashcardsPreview, setFlashcardsPreview] = useState<any>(null);
+  const [quizPreview, setQuizPreview] = useState<any>(null);
+  const [summaryPreview, setSummaryPreview] = useState<any>(null);
 
   // Fetch content details
   const { data: content, isLoading: contentLoading } = useQuery({
@@ -36,25 +42,52 @@ export default function ContentDetailPage() {
     generateFlashcards,
     generateQuiz,
     generateSummary,
+    saveFlashcards,
+    saveQuiz,
+    saveSummary,
     materials,
     isLoading: materialsLoading,
     isGenerating,
+    isSaving,
+    deleteMaterial,
   } = useMaterials(id);
 
-  const handleGenerateFlashcards = (title: string, count?: number) => {
-    generateFlashcards.mutate({ title, count });
+  // Handle generation (step 1)
+  const handleGenerateFlashcards = async (options: any) => {
+    const result = await generateFlashcards.mutateAsync(options);
+    setFlashcardsPreview(result);
   };
 
-  const handleGenerateQuiz = (title: string, count?: number) => {
-    generateQuiz.mutate({ title, count });
+  const handleGenerateQuiz = async (options: any) => {
+    const result = await generateQuiz.mutateAsync(options);
+    setQuizPreview(result);
   };
 
-  const handleGenerateSummary = (title: string) => {
-    generateSummary.mutate({ title });
+  const handleGenerateSummary = async (options: any) => {
+    const result = await generateSummary.mutateAsync(options);
+    setSummaryPreview(result);
   };
 
-  const handleDeleteMaterial = async (materialId: string) => {
-    // TODO: Implement delete
+  // Handle saving (step 2)
+  const handleSaveFlashcards = (data: any) => {
+    saveFlashcards.mutate(data);
+    setFlashcardsPreview(null);
+  };
+
+  const handleSaveQuiz = (data: any) => {
+    saveQuiz.mutate(data);
+    setQuizPreview(null);
+  };
+
+  const handleSaveSummary = (data: any) => {
+    saveSummary.mutate(data);
+    setSummaryPreview(null);
+  };
+
+  const handleDeleteMaterial = (materialId: string) => {
+    if (confirm("Are you sure you want to delete this material?")) {
+      deleteMaterial.mutate(materialId);
+    }
   };
 
   if (contentLoading) {
@@ -109,32 +142,32 @@ export default function ContentDetailPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {isGenerating ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p className="ml-3 text-muted-foreground">
-                  Generating materials with AI...
-                </p>
-              </div>
-            ) : (
-              <div className="grid gap-4 md:grid-cols-3">
-                <GenerateDialog
-                  type="flashcard"
-                  onGenerate={handleGenerateFlashcards}
-                  isGenerating={isGenerating}
-                />
-                <GenerateDialog
-                  type="quiz"
-                  onGenerate={handleGenerateQuiz}
-                  isGenerating={isGenerating}
-                />
-                <GenerateDialog
-                  type="summary"
-                  onGenerate={handleGenerateSummary}
-                  isGenerating={isGenerating}
-                />
-              </div>
-            )}
+            <div className="grid gap-4 md:grid-cols-3">
+              <GeneratePreviewDialog
+                type="flashcard"
+                onGenerate={handleGenerateFlashcards}
+                onSave={handleSaveFlashcards}
+                isGenerating={generateFlashcards.isPending}
+                isSaving={saveFlashcards.isPending}
+                generatedData={flashcardsPreview}
+              />
+              <GeneratePreviewDialog
+                type="quiz"
+                onGenerate={handleGenerateQuiz}
+                onSave={handleSaveQuiz}
+                isGenerating={generateQuiz.isPending}
+                isSaving={saveQuiz.isPending}
+                generatedData={quizPreview}
+              />
+              <GeneratePreviewDialog
+                type="summary"
+                onGenerate={handleGenerateSummary}
+                onSave={handleSaveSummary}
+                isGenerating={generateSummary.isPending}
+                isSaving={saveSummary.isPending}
+                generatedData={summaryPreview}
+              />
+            </div>
           </CardContent>
         </Card>
 

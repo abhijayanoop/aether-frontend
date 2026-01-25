@@ -60,15 +60,17 @@ export interface StudyMaterial {
   _id: string;
   userId: string;
   contentId: string;
-  type: "flashcard" | "quiz" | "summary";
+  type: "flashcard" | "quiz" | "summary" | "concepts";
   title: string;
   data: {
     flashcards?: Flashcard[];
     questions?: QuizQuestion[];
     summary?: string;
+    concepts?: KeyConcept[];
   };
   tags: string[];
   folder?: string;
+  difficulty?: "easy" | "medium" | "hard";
   createdAt: string;
   updatedAt: string;
 }
@@ -85,9 +87,41 @@ export interface QuizQuestion {
   explanation?: string;
 }
 
-export interface GenerateMaterialRequest {
+export interface KeyConcept {
+  term: string;
+  definition: string;
+  category?: string;
+}
+
+// Generation request types
+export interface GenerateFlashcardsRequest {
+  count?: number; // 5-50, default: 10
+  difficulty?: "easy" | "medium" | "hard";
+  tags?: string[];
+}
+
+export interface GenerateQuizRequest {
+  questionCount?: number; // 5-50, default: 10
+  difficulty?: "easy" | "medium" | "hard";
+  questionType?: "multiple-choice" | "true-false" | "mixed";
+  tags?: string[];
+}
+
+export interface GenerateSummaryRequest {
+  length?: "short" | "medium" | "long";
+  format?: "paragraph" | "bullet-points" | "detailed";
+  tags?: string[];
+}
+
+// Save request types (after generation)
+export interface SaveMaterialRequest {
   title: string;
-  count?: number;
+  data: {
+    flashcards?: Flashcard[];
+    questions?: QuizQuestion[];
+    summary?: string;
+    concepts?: KeyConcept[];
+  };
   tags?: string[];
   folder?: string;
 }

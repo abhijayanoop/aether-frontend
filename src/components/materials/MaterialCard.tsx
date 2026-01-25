@@ -1,14 +1,12 @@
 import { useNavigate } from "react-router-dom";
-import { formatDistanceToNow } from "date-fns";
+import { Play, MoreVertical, Trash2, Edit } from "lucide-react";
 import {
-  BookOpen,
-  Brain,
-  FileText,
-  MoreVertical,
-  Play,
-  Trash2,
-} from "lucide-react";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -30,62 +28,117 @@ export function MaterialCard({ material, onDelete }: MaterialCardProps) {
   const getIcon = () => {
     switch (material.type) {
       case "flashcard":
-        return <BookOpen className="h-5 w-5 text-blue-600" />;
+        return "📇";
       case "quiz":
-        return <Brain className="h-5 w-5 text-green-600" />;
+        return "📝";
       case "summary":
-        return <FileText className="h-5 w-5 text-purple-600" />;
+        return "📄";
+      case "concepts":
+        return "💡";
+      default:
+        return "📚";
     }
   };
 
   const getCount = () => {
-    switch (material.type) {
-      case "flashcard":
-        return `${material.data.flashcards?.length || 0} cards`;
-      case "quiz":
-        return `${material.data.questions?.length || 0} questions`;
-      case "summary":
-        return "Summary";
+    // Check if data exists first
+    if (!material.data) {
+      return null;
     }
+
+    // Check each type with proper null guards
+    if (material.type === "flashcard") {
+      if (material.data.flashcards && Array.isArray(material.data.flashcards)) {
+        return `${material.data.flashcards.length} cards`;
+      }
+      return null;
+    }
+
+    if (material.type === "quiz") {
+      if (material.data.questions && Array.isArray(material.data.questions)) {
+        return `${material.data.questions.length} questions`;
+      }
+      // Also check for attempts (some quiz data only has attempts)
+      if (material.data.attempts && Array.isArray(material.data.attempts)) {
+        return `${material.data.attempts.length} attempts`;
+      }
+      return null;
+    }
+
+    if (material.type === "concepts") {
+      if (material.data.concepts && Array.isArray(material.data.concepts)) {
+        return `${material.data.concepts.length} concepts`;
+      }
+      // Also check for keyConcepts
+      if (
+        material.data.keyConcepts &&
+        Array.isArray(material.data.keyConcepts)
+      ) {
+        return `${material.data.keyConcepts.length} concepts`;
+      }
+      return null;
+    }
+
+    if (material.type === "summary") {
+      if (material.data.summary) {
+        return "Summary";
+      }
+      return null;
+    }
+
+    return null;
   };
 
   const getRoute = () => {
     switch (material.type) {
       case "flashcard":
-        return `/materials/flashcards/${material._id}`;
+        return `/study/flashcards/${material._id}`;
       case "quiz":
-        return `/materials/quiz/${material._id}`;
+        return `/study/quiz/${material._id}`;
       case "summary":
-        return `/materials/summary/${material._id}`;
+        return `/study/summary/${material._id}`;
+      case "concepts":
+        return `/study/concepts/${material._id}`;
+      default:
+        return `/study/${material._id}`;
     }
   };
 
+  const count = getCount();
+
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardContent className="pt-6">
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div className="p-2 bg-accent rounded-md">{getIcon()}</div>
-            <div className="flex-1 min-w-0">
-              <h3 className="font-semibold truncate">{material.title}</h3>
-              <p className="text-sm text-muted-foreground">
-                {getCount()} •{" "}
-                {formatDistanceToNow(new Date(material.createdAt), {
-                  addSuffix: true,
-                })}
-              </p>
+    <Card className="hover:shadow-lg transition-shadow">
+      <CardHeader>
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">{getIcon()}</span>
+            <div>
+              <CardTitle className="text-lg">{material.title}</CardTitle>
+              {count && (
+                <p className="text-sm text-muted-foreground mt-1">{count}</p>
+              )}
             </div>
           </div>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="sm">
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => navigate(getRoute())}>
+                <Edit className="h-4 w-4 mr-2" />
+                View
+              </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => onDelete(material._id)}
+                onClick={() => {
+                  if (
+                    confirm("Are you sure you want to delete this material?")
+                  ) {
+                    onDelete(material._id);
+                  }
+                }}
                 className="text-destructive"
               >
                 <Trash2 className="h-4 w-4 mr-2" />
@@ -94,12 +147,18 @@ export function MaterialCard({ material, onDelete }: MaterialCardProps) {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+      </CardHeader>
 
+      <CardContent>
         {/* Tags */}
-        {material.tags.length > 0 && (
+        {material.tags && material.tags.length > 0 && (
           <div className="flex flex-wrap gap-1 mb-3">
-            {material.tags.slice(0, 3).map((tag) => (
-              <Badge key={tag} variant="secondary" className="text-xs">
+            {material.tags.slice(0, 3).map((tag, index) => (
+              <Badge
+                key={`${tag}-${index}`}
+                variant="secondary"
+                className="text-xs"
+              >
                 {tag}
               </Badge>
             ))}
@@ -113,7 +172,23 @@ export function MaterialCard({ material, onDelete }: MaterialCardProps) {
 
         {/* Folder */}
         {material.folder && (
-          <p className="text-xs text-muted-foreground">📁 {material.folder}</p>
+          <p className="text-xs text-muted-foreground mb-2">
+            📁 {material.folder}
+          </p>
+        )}
+
+        {/* Difficulty */}
+        {material.difficulty && (
+          <Badge variant="outline" className="text-xs capitalize">
+            {material.difficulty}
+          </Badge>
+        )}
+
+        {/* Show message if data is missing */}
+        {!material.data && (
+          <p className="text-xs text-muted-foreground italic mt-2">
+            Content not available
+          </p>
         )}
       </CardContent>
 
