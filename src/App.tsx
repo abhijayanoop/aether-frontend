@@ -8,6 +8,7 @@ import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import DashboardPage from "@/pages/DashboardPage";
 import UploadPage from "@/pages/UploadPage";
+import ContentPage from "./pages/ContentPage";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -44,7 +45,14 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-              {/* ... other routes ... */}
+              <Route
+                path="/content"
+                element={
+                  <ProtectedRoute>
+                    <ContentPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
             </Routes>
             <Toaster position="top-right" richColors />

@@ -44,7 +44,7 @@ export interface Content {
     mimeType?: string;
     duration?: number;
   };
-  status: "pending" | "processing" | "completed" | "failed";
+  processingStatus: "pending" | "processing" | "completed" | "failed";
   createdAt: string;
 }
 
