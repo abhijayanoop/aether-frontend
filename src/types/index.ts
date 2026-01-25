@@ -55,3 +55,39 @@ export interface JobStatus {
   result?: any;
   error?: string;
 }
+
+export interface StudyMaterial {
+  _id: string;
+  userId: string;
+  contentId: string;
+  type: "flashcard" | "quiz" | "summary";
+  title: string;
+  data: {
+    flashcards?: Flashcard[];
+    questions?: QuizQuestion[];
+    summary?: string;
+  };
+  tags: string[];
+  folder?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Flashcard {
+  question: string;
+  answer: string;
+}
+
+export interface QuizQuestion {
+  question: string;
+  options: string[];
+  correctAnswer: number;
+  explanation?: string;
+}
+
+export interface GenerateMaterialRequest {
+  title: string;
+  count?: number;
+  tags?: string[];
+  folder?: string;
+}

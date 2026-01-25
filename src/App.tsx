@@ -9,6 +9,7 @@ import RegisterPage from "@/pages/RegisterPage";
 import DashboardPage from "@/pages/DashboardPage";
 import UploadPage from "@/pages/UploadPage";
 import ContentPage from "./pages/ContentPage";
+import ContentDetailPage from "./pages/ContentDetailPage";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -50,6 +51,15 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <ContentPage />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/content/:id"
+                element={
+                  <ProtectedRoute>
+                    <ContentDetailPage />
                   </ProtectedRoute>
                 }
               />
