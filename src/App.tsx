@@ -10,6 +10,9 @@ import DashboardPage from "@/pages/DashboardPage";
 import UploadPage from "@/pages/UploadPage";
 import ContentPage from "./pages/ContentPage";
 import ContentDetailPage from "./pages/ContentDetailPage";
+import QuizPage from "./pages/QuizPage";
+import SummaryPage from "./pages/SummaryPage";
+import FlashcardsPage from "./pages/FlashcardsPage";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -60,6 +63,31 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <ContentDetailPage />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/study/flashcards/:id"
+                element={
+                  <ProtectedRoute>
+                    <FlashcardsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/study/quiz/:id"
+                element={
+                  <ProtectedRoute>
+                    <QuizPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/study/summary/:id"
+                element={
+                  <ProtectedRoute>
+                    <SummaryPage />
                   </ProtectedRoute>
                 }
               />

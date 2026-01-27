@@ -56,10 +56,17 @@ export interface JobStatus {
   error?: string;
 }
 
+export interface ContentReference {
+  _id: string;
+  type: "pdf" | "url" | "youtube";
+  title: string;
+  sourceUrl?: string;
+}
+
 export interface StudyMaterial {
   _id: string;
   userId: string;
-  contentId: string;
+  contentId: string | ContentReference;
   type: "flashcard" | "quiz" | "summary" | "concepts";
   title: string;
   data: {
@@ -70,6 +77,7 @@ export interface StudyMaterial {
   };
   tags: string[];
   folder?: string;
+  isPublic?: boolean;
   difficulty?: "easy" | "medium" | "hard";
   createdAt: string;
   updatedAt: string;

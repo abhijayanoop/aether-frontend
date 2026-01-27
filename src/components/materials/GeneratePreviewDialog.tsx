@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Brain, Loader2, Save, Edit2 } from "lucide-react";
+import { Brain, Loader2, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -20,12 +20,7 @@ import type { Flashcard, QuizQuestion } from "@/types";
 interface GeneratePreviewDialogProps {
   type: "flashcard" | "quiz" | "summary";
   onGenerate: (options: any) => Promise<void>;
-  onSave: (data: {
-    title: string;
-    data: any;
-    tags?: string[];
-    folder?: string;
-  }) => void;
+  onSave: (data: any) => void;
   isGenerating: boolean;
   isSaving: boolean;
   generatedData?: any;
@@ -65,6 +60,7 @@ export function GeneratePreviewDialog({
       if (type === "flashcard" && generatedData.flashcards) {
         actualData = generatedData.flashcards;
       } else if (type === "quiz" && generatedData.quiz) {
+        // IMPORTANT: Backend returns "quiz" not "questions"
         actualData = generatedData.quiz;
       } else if (type === "summary" && generatedData.summary) {
         actualData = generatedData.summary;
@@ -125,11 +121,11 @@ export function GeneratePreviewDialog({
       options.count = count;
       options.difficulty = difficulty;
     } else if (type === "quiz") {
-      options.questionCount = count;
+      options.count = count;
       options.difficulty = difficulty;
       options.questionType = "multiple-choice";
     } else if (type === "summary") {
-      options.length = "medium";
+      options.type = "short";
       options.format = "paragraph";
     }
 
@@ -142,17 +138,31 @@ export function GeneratePreviewDialog({
       .map((t) => t.trim())
       .filter(Boolean);
 
-    onSave({
-      title,
-      data:
-        type === "flashcard"
-          ? { flashcards: editedData }
-          : type === "quiz"
-            ? { questions: editedData }
-            : { summary: editedData },
-      tags: tagsArray.length > 0 ? tagsArray : undefined,
-      folder: folder || undefined,
-    });
+    // Different save format based on type
+    if (type === "flashcard") {
+      onSave({
+        title,
+        flashcards: editedData, // Array of flashcards
+        tags: tagsArray.length > 0 ? tagsArray : undefined,
+        folder: folder || undefined,
+      });
+    } else if (type === "quiz") {
+      onSave({
+        title,
+        questions: editedData, // Array of questions (NOT "quiz")
+        tags: tagsArray.length > 0 ? tagsArray : undefined,
+        folder: folder || undefined,
+      });
+    } else if (type === "summary") {
+      onSave({
+        title,
+        summary: editedData, // String
+        summaryType: "short",
+        keyConcepts: [],
+        tags: tagsArray.length > 0 ? tagsArray : undefined,
+        folder: folder || undefined,
+      });
+    }
 
     // Reset and close
     handleClose();
