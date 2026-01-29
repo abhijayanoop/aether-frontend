@@ -13,6 +13,7 @@ import ContentDetailPage from "./pages/ContentDetailPage";
 import QuizPage from "./pages/QuizPage";
 import SummaryPage from "./pages/SummaryPage";
 import FlashcardsPage from "./pages/FlashcardsPage";
+import MaterialsLibraryPage from "./pages/MaterialsLibraryPage";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -88,6 +89,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <SummaryPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/materials"
+                element={
+                  <ProtectedRoute>
+                    <MaterialsLibraryPage />
                   </ProtectedRoute>
                 }
               />
